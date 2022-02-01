@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="match_parent"
+        android:layout_height="600dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:contentDescription="Placeholder to show solved images"
+        tools:ignore="HardcodedText" />
+    <Button
+        android:id="@+id/take_picture_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="5dp"
+        android:layout_marginTop="0dp"
+        android:textSize="17sp"
+        android:text="Take Picture"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/solve_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/take_picture_btn"
+        android:layout_margin="5dp"
+        android:text="Solve Image"
+        android:textSize="17sp"
+        tools:ignore="HardcodedText" />
+
+</RelativeLayout>
