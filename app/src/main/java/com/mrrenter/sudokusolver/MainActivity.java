@@ -4,11 +4,16 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import org.opencv.android.OpenCVLoader;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,8 +35,12 @@ public class MainActivity extends AppCompatActivity {
         captureImageBtn.setOnClickListener(view -> dispatchTakePictureIntent());
     }
 
-    private void solveImage(){
-
+    private void solveImage() {
+        if (OpenCVLoader.initDebug()) {
+            Log.d("MrRenterLog", "OpenCV is correctly installed");
+        } else {
+            Log.d("MrRenterLog", "OpenCV is NOT correctly installed");
+        }
     }
 
     //Method to be called to open the camera
