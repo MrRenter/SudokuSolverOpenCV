@@ -9,9 +9,8 @@
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="0dp"
+        android:layout_height="460dp"
+        android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:contentDescription="Placeholder to show solved images"
