@@ -5,15 +5,19 @@ import org.opencv.android.CameraActivity;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.imgproc.Imgproc;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +29,11 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private CameraBridgeViewBase mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
     private MenuItem             mItemSwitchCamera = null;
+    private Button captureImageBtn, solveImageBtn;
+    Mat savedImage;
+    View cameraView;
+
+    Boolean invertImage = false;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -61,6 +70,23 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
 
         mOpenCvCameraView.setCvCameraViewListener(this);
+
+        captureImageBtn = findViewById(R.id.take_picture_btn);
+        solveImageBtn = findViewById(R.id.solve_btn);
+        cameraView = findViewById(R.id.image_view);
+
+        captureImageBtn.setOnClickListener(view -> getPicture());
+        solveImageBtn.setOnClickListener(view -> testFunctions());
+    }
+
+    public void getPicture(){
+
+        mOpenCvCameraView.disableView();
+
+    }
+
+    public void testFunctions(){
+        invertImage = !invertImage;
     }
 
     @Override
@@ -102,6 +128,10 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
+        //savedImage = inputFrame.rgba();
+        if (invertImage){
+            return inputFrame.gray();
+        }
         return inputFrame.rgba();
     }
 }
