@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/image_view"
-        android:layout_width="match_parent"
+    <org.opencv.android.JavaCameraView
+        android:layout_width="fill_parent"
         android:layout_height="460dp"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:contentDescription="Placeholder to show solved images"
-        tools:ignore="HardcodedText" />
+        android:visibility="gone"
+        android:id="@+id/image_view"
+        opencv:show_fps="true"
+        opencv:camera_id="any" />
+
     <Button
         android:id="@+id/take_picture_btn"
         android:layout_width="match_parent"
