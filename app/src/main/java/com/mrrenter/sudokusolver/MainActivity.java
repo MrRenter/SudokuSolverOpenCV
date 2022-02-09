@@ -5,10 +5,14 @@ import org.opencv.android.CameraActivity;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import android.os.Bundle;
@@ -18,7 +22,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-
+import org.opencv.core.Scalar;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +38,10 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     Mat savedImage;
     View cameraView;
 
+    Boolean takePicture = false;
     Boolean invertImage = false;
+
+    static double areaThreshold;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -77,12 +85,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
         captureImageBtn.setOnClickListener(view -> getPicture());
         solveImageBtn.setOnClickListener(view -> testFunctions());
+
+        areaThreshold = mOpenCvCameraView.getWidth()*mOpenCvCameraView.getHeight()*0.80;
     }
 
     public void getPicture(){
-
-        mOpenCvCameraView.disableView();
-
+        takePicture = !takePicture;
     }
 
     public void testFunctions(){
@@ -128,10 +136,37 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-        //savedImage = inputFrame.rgba();
+        Mat modifiedFrame = inputFrame.gray();
         if (invertImage){
-            return inputFrame.gray();
+            Imgproc.GaussianBlur(inputFrame.gray(), modifiedFrame, new Size(7,7),3);
+            Imgproc.adaptiveThreshold(modifiedFrame, modifiedFrame, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 11, 2);
+            Core.bitwise_not(modifiedFrame,modifiedFrame);
+
+            return getLargestRect(modifiedFrame, inputFrame.rgba());
         }
         return inputFrame.rgba();
+    }
+
+    public static Mat getLargestRect(Mat bit, Mat img) {
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Imgproc.findContours(bit, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+        double inf = 0;
+        Rect max_rect = null;
+        for(int i=0; i< contours.size();i++){
+            Rect rect = Imgproc.boundingRect(contours.get(i));
+
+            double area = rect.area();
+            if(area > areaThreshold) {
+                if(inf < area) {
+                    max_rect = rect;
+                    inf = area;
+                }
+            }
+
+        }
+        if (max_rect != null) {
+            Imgproc.rectangle(img, new Point(max_rect.x, max_rect.y), new Point(max_rect.x + max_rect.width, max_rect.y + max_rect.height), new Scalar(0, 255, 0), 5);
+        }
+        return img;
     }
 }
