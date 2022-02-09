@@ -14,6 +14,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,7 +63,13 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
+            Mat imageMat = new Mat(imageBitmap.getHeight(),imageBitmap.getWidth(),0);
+
+            Utils.bitmapToMat(imageBitmap, imageMat);
+            Utils.matToBitmap(imageMat, imageBitmap);
             imageView.setImageBitmap(imageBitmap);
+
+
             solveImage();
         }
     }
