@@ -1,6 +1,7 @@
 package com.mrrenter.sudokusolver;
 
 import android.util.Log;
+import android.view.View;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.Utils;
@@ -25,7 +26,7 @@ public class Helper {
     public Helper(CameraBridgeViewBase camera) {
         mOpenCvCameraView = camera;
 
-        areaMinThreshold = 200000; //mOpenCvCameraView.getWidth()*mOpenCvCameraView.getHeight()*0.50;
+        areaMinThreshold = 80000; //mOpenCvCameraView.getWidth()*mOpenCvCameraView.getHeight()*0.50;
         areaMaxThreshold = 600000;//mOpenCvCameraView.getWidth() * mOpenCvCameraView.getHeight() * 0.80;
     }
 
@@ -57,26 +58,27 @@ public class Helper {
 
                 if (area > areaMinThreshold && area < areaMaxThreshold) {
 
-                    Point min = getMinPoint(points);
-                    Point max = getMaxPoint(points);
+                    if (rect.height - rect.width < (rect.height*.1)) {
+                        Point min = getMinPoint(points);
+                        Point max = getMaxPoint(points);
 
-                    double slope = (max.y - min.y) / (max.x - min.x);
-                    if (slope < 0){
-                        slope *= -1;
+                        double slope = (max.y - min.y) / (max.x - min.x);
+                        if (slope < 0) {
+                            slope *= -1;
+                        }
+
+                        if (slope > (1 - slopeThresh) && slope < (1 + slopeThresh)) {
+                            Log.d("MrRenterDebug", "Area: " + area + " Slope: " + slope);
+                            max_rect = rect;
+                            maxpoint = points;
+                        }
                     }
-
-                    if (slope > (1 - slopeThresh) && slope < (1 + slopeThresh)) {
-                        Log.d("MrRenterDebug", "Area: " + area + " Slope: " + slope);
-                        max_rect = rect;
-                        maxpoint = points;
-                    }
-
                 }
             }
         }
 
         if (max_rect != null) {
-            Imgproc.rectangle(img, new Point(max_rect.x, max_rect.y), new Point(max_rect.x + max_rect.width, max_rect.y + max_rect.height), new Scalar(0, 255, 0), 5);
+            Imgproc.rectangle(img, max_rect, new Scalar(255,0,0),5);
         }
         return img;
     }

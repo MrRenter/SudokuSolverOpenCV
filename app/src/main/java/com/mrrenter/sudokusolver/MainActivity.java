@@ -23,6 +23,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
+
 import org.opencv.core.Scalar;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +40,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private Button captureImageBtn, solveImageBtn;
     Mat savedImage;
     View cameraView;
+    TextView statusText;
 
     Boolean freezePicture = false;
     Boolean invertImage = false;
@@ -83,6 +86,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         captureImageBtn = findViewById(R.id.take_picture_btn);
         solveImageBtn = findViewById(R.id.solve_btn);
         cameraView = findViewById(R.id.image_view);
+        statusText = findViewById(R.id.statusView);
 
         captureImageBtn.setOnClickListener(view -> getPicture());
         solveImageBtn.setOnClickListener(view -> testFunctions());
@@ -96,6 +100,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
     public void testFunctions(){
         invertImage = !invertImage;
+        if (invertImage){
+            statusText.setText("Running");
+        } else {
+            statusText.setText("Not Running");
+
+        }
     }
 
     @Override
@@ -137,8 +147,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
+        CvCameraViewFrame tempImg = inputFrame;
+        Mat rgbMat = tempImg.rgba();
+        Mat grayMat = tempImg.gray();
         if (invertImage){
-            return rr.getLargestRect(rr.prepImage(inputFrame.gray()), inputFrame.rgba());
+            //return inputFrame.rgba();
+            return rr.getLargestRect(rr.prepImage(grayMat), rgbMat);
         }
         if (!freezePicture){
             savedImage = inputFrame.rgba();
