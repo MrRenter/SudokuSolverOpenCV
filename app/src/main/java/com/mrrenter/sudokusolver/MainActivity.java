@@ -32,17 +32,19 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
     private static final String TAG = "OCVSample::Activity";
 
-    private CameraBridgeViewBase mOpenCvCameraView;
+    static CameraBridgeViewBase mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
     private MenuItem             mItemSwitchCamera = null;
     private Button captureImageBtn, solveImageBtn;
     Mat savedImage;
     View cameraView;
 
-    Boolean takePicture = false;
+    Boolean freezePicture = false;
     Boolean invertImage = false;
+    static Boolean lastFrame = false;
 
-    static double areaThreshold;
+    static double areaMinThreshold;
+    static double areaMaxThreshold;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -87,11 +89,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         captureImageBtn.setOnClickListener(view -> getPicture());
         solveImageBtn.setOnClickListener(view -> testFunctions());
 
-        areaThreshold = mOpenCvCameraView.getWidth()*mOpenCvCameraView.getHeight()*0.80;
+        areaMinThreshold = mOpenCvCameraView.getWidth()*mOpenCvCameraView.getHeight()*0.60;
+        areaMaxThreshold = mOpenCvCameraView.getWidth()*mOpenCvCameraView.getHeight()*0.80;
     }
 
     public void getPicture(){
-        takePicture = !takePicture;
+        freezePicture = !freezePicture;
     }
 
     public void testFunctions(){
@@ -145,7 +148,10 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
             return getLargestRect(modifiedFrame, inputFrame.rgba());
         }
-        return inputFrame.rgba();
+        if (!freezePicture){
+            savedImage = inputFrame.rgba();
+        }
+        return savedImage;
     }
 
     public static Mat getLargestRect(Mat bit, Mat img) {
@@ -162,11 +168,10 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             double peri = Imgproc.arcLength(c2f, true);
             Imgproc.approxPolyDP(c2f, approx, 0.04*peri, true);
             Point[] points = approx.toArray();
-
             if (points.length == 4) {
                 //Not making sure its actually a square
                 double area = rect.area();
-                if (area > areaThreshold) {
+                if (area > areaMinThreshold) {
                     if (inf < area) {
                         max_rect = rect;
                         inf = area;
