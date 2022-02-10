@@ -10,6 +10,7 @@ import org.opencv.core.Mat;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
@@ -155,14 +156,23 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         for(int i=0; i< contours.size();i++){
             Rect rect = Imgproc.boundingRect(contours.get(i));
 
-            double area = rect.area();
-            if(area > areaThreshold) {
-                if(inf < area) {
-                    max_rect = rect;
-                    inf = area;
+            MatOfPoint2f c2f = new MatOfPoint2f(contours.get(i).toArray());
+            MatOfPoint2f approx = new MatOfPoint2f();
+
+            double peri = Imgproc.arcLength(c2f, true);
+            Imgproc.approxPolyDP(c2f, approx, 0.04*peri, true);
+            Point[] points = approx.toArray();
+
+            if (points.length == 4) {
+                //Not making sure its actually a square
+                double area = rect.area();
+                if (area > areaThreshold) {
+                    if (inf < area) {
+                        max_rect = rect;
+                        inf = area;
+                    }
                 }
             }
-
         }
         if (max_rect != null) {
             Imgproc.rectangle(img, new Point(max_rect.x, max_rect.y), new Point(max_rect.x + max_rect.width, max_rect.y + max_rect.height), new Scalar(0, 255, 0), 5);
