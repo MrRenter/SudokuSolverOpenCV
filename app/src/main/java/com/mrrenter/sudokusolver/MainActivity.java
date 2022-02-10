@@ -23,6 +23,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.opencv.core.Scalar;
@@ -40,6 +41,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private Button captureImageBtn, solveImageBtn;
     Mat savedImage;
     View cameraView;
+    ImageView transformView;
     TextView statusText;
 
     Boolean freezePicture = false;
@@ -87,15 +89,18 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         solveImageBtn = findViewById(R.id.solve_btn);
         cameraView = findViewById(R.id.image_view);
         statusText = findViewById(R.id.statusView);
+        transformView = findViewById(R.id.transform_view);
+
 
         captureImageBtn.setOnClickListener(view -> getPicture());
         solveImageBtn.setOnClickListener(view -> testFunctions());
 
-        rr = new Helper(mOpenCvCameraView);
+        rr = new Helper(mOpenCvCameraView, transformView);
     }
 
     public void getPicture(){
         freezePicture = !freezePicture;
+        setContentView(R.layout.show_transform);
     }
 
     public void testFunctions(){
